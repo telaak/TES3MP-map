@@ -1,6 +1,8 @@
 # TES3MP-map
 Dynamic web map for players using UESP's Morrowind map
 
+![Screenshot](https://laaksonen.me/tes3mp.PNG)
+
 ## Installing
 
 install the node.js package
