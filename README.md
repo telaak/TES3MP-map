@@ -1,7 +1,7 @@
 # TES3MP-map
 Dynamic web map for players using UESP's Morrowind map
 
-![Screenshot](https://laaksonen.eu/tes3mp.PNG)
+![Screenshot](https://laaksonen.eu/tes3map-playerheads.png)
 
 ## Installing
 
