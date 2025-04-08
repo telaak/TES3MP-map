@@ -8,19 +8,19 @@ do
                 if (Players[i] ~= nil and Players[i].loggedIn) then
                     local request_body = {
                         name = Players[i].data.login.name,
+                        head = tes3mp.GetHead(i),
+                        hair = tes3mp.GetHair(i),
+                        race = tes3mp.GetRace(i),
+                        isMale = tes3mp.GetIsMale(i),
                         location = {
                             cell = tes3mp.GetCell(i),
                             regionName = Players[i].data.location.regionName,
                             posX = tes3mp.GetPosX(i),
                             posY = tes3mp.GetPosY(i),
                             posZ = tes3mp.GetPosZ(i),
-                            head = tes3mp.GetHead(i),
-                            hair = tes3mp.GetHairstyle(i),
-                            race = tes3mp.GetRace(i),
-                            isMale = tes3mp.GetIsMale(i),
                             previousX = tes3mp.GetPreviousCellPosX(i),
-                            previousY = tes3mp.getPreviousCellPosY(i),
-                            previousZ = tes3mp.getPreviousCellPosZ(i)
+                            previousY = tes3mp.GetPreviousCellPosY(i),
+                            previousZ = tes3mp.GetPreviousCellPosZ(i)
                         }
                     }
 
