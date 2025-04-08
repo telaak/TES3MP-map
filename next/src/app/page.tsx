@@ -4,9 +4,10 @@ import { AnimatedMarker, animateMarkerTo, getFrame } from "./MwMapIframe";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Player } from "./players/route";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 
 export default function Home() {
-  const locations = useQuery({
+  const players = useQuery({
     queryKey: ["players"],
     queryFn: () =>
       fetch("/players").then((res) => res.json()) as Promise<Player[]>,
@@ -18,12 +19,12 @@ export default function Home() {
   const [isFrameLoaded, setIsFrameLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    if (locations.data && isFrameLoaded) {
+    if (players.data && isFrameLoaded) {
       const contentWindow = getFrame().contentWindow;
       const frameGoogle = contentWindow.google;
       const map = contentWindow.umMap;
 
-      for (const player of locations.data) {
+      for (const player of players.data) {
         const marker = markers.find((m) =>
           (m.getTitle() as string).startsWith(player.name)
         );
@@ -57,22 +58,75 @@ export default function Home() {
         }
       }
     }
-  }, [locations.data, isFrameLoaded]);
+  }, [players.data, isFrameLoaded]);
 
   return (
-    <div
+    <Stack
+      direction="column"
       style={{
-        height: "100dvh",
+        height: "calc(100dvh - 8px)",
         width: "100dvw",
       }}
     >
-      <Iframe
-        onLoad={() => setIsFrameLoaded(true)}
-        id="frame"
-        url="/frame"
-        width="100%"
-        height="100%"
-      ></Iframe>
-    </div>
+      <Stack
+        style={{
+          padding: "0.5em",
+        }}
+        direction="row"
+        spacing={2}
+      >
+        {players.data &&
+          players.data.map((player) => {
+            return (
+              <Chip
+                label={
+                  <>
+                    <Typography variant="h6">{player.name}</Typography>
+                    <Typography variant="body2">
+                      {player.location.regionName || player.location.cell}
+                    </Typography>
+                  </>
+                }
+                onClick={() => {
+                  try {
+                    const contentWindow = getFrame().contentWindow;
+                    const map = contentWindow.umMap;
+
+                    const marker = markers.find((m) =>
+                      m.getTitle()!.startsWith(player.name)
+                    );
+
+                    map.panTo(marker!.getPosition() as google.maps.LatLng);
+                    map.setZoom(16);
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+                sx={{
+                  height: "auto",
+                  "& .MuiChip-label": {
+                    display: "block",
+                    whiteSpace: "normal",
+                  },
+                }}
+                key={player.name}
+              />
+            );
+          })}
+      </Stack>
+      <Box
+        sx={{
+          height: "100%",
+        }}
+      >
+        <Iframe
+          onLoad={() => setIsFrameLoaded(true)}
+          id="frame"
+          url="/frame"
+          width="100%"
+          height="100%"
+        ></Iframe>
+      </Box>
+    </Stack>
   );
 }
