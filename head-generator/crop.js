@@ -1,13 +1,12 @@
-import Jimp from "jimp";
 import replaceColor from "replace-color";
 import fs from "fs";
 
-const heads = fs.readdirSync("./new");
+const heads = fs.readdirSync("heads");
 
 const parseHeads = async () => {
   for (const head of heads) {
     await replaceColor({
-      image: "new/" + head,
+      image: "heads/" + head,
       colors: {
         type: "hex",
         targetColor: "#00FF00",
