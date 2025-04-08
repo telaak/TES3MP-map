@@ -49,7 +49,7 @@ export default function Home() {
             ),
             map,
             icon: {
-              url: `/cropped/${player.head}-${player.hair}.png`,
+              url: `/head/${player.head}-${player.hair}.png`,
               scaledSize: new frameGoogle.maps.Size(50, 50),
             },
           });
