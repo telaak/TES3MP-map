@@ -13,7 +13,14 @@ do
                             regionName = Players[i].data.location.regionName,
                             posX = tes3mp.GetPosX(i),
                             posY = tes3mp.GetPosY(i),
-                            posZ = tes3mp.GetPosZ(i)
+                            posZ = tes3mp.GetPosZ(i),
+                            head = tes3mp.GetHead(i),
+                            hair = tes3mp.GetHairstyle(i),
+                            race = tes3mp.GetRace(i),
+                            isMale = tes3mp.GetIsMale(i),
+                            previousX = tes3mp.GetPreviousCellPosX(i),
+                            previousY = tes3mp.getPreviousCellPosY(i),
+                            previousZ = tes3mp.getPreviousCellPosZ(i)
                         }
                     }
 
