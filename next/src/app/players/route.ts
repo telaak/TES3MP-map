@@ -2,12 +2,19 @@ import { NextRequest } from "next/server";
 
 export type Player = {
   name: string;
+  head: string;
+  hair: string;
+  race: string;
+  isMale: number;
   location: {
     cell: string;
     posX: number;
-    regionName: string;
     posY: number;
     posZ: number;
+    previousX: number;
+    previousY: number;
+    previousZ: number;
+    regionName: string;
   };
 };
 
@@ -23,7 +30,7 @@ export async function POST(request: NextRequest) {
     } else {
       players.push(json);
     }
-    
+
     return new Response("OK", {
       status: 200,
     });

@@ -3,12 +3,13 @@ import Iframe from "react-iframe";
 import { AnimatedMarker, animateMarkerTo, getFrame } from "./MwMapIframe";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Player } from "./map/route";
+import { Player } from "./players/route";
 
 export default function Home() {
   const locations = useQuery({
-    queryKey: ["locations"],
-    queryFn: () => fetch("/map").then((res) => res.json()) as Promise<Player[]>,
+    queryKey: ["players"],
+    queryFn: () =>
+      fetch("/players").then((res) => res.json()) as Promise<Player[]>,
     refetchInterval: 250,
   });
 
@@ -23,7 +24,9 @@ export default function Home() {
       const map = contentWindow.umMap;
 
       for (const player of locations.data) {
-        const marker = markers.find((m) => m.getTitle() === player.name);
+        const marker = markers.find((m) =>
+          (m.getTitle() as string).startsWith(player.name)
+        );
         if (marker) {
           if (player.location.regionName.length > 0) {
             animateMarkerTo(
@@ -33,15 +36,22 @@ export default function Home() {
                 player.location.posY
               )
             );
+            marker.setTitle(`${player.name} - ${player.location.regionName}`);
+          } else {
+            marker.setTitle(`${player.name} - ${player.location.cell}`);
           }
         } else {
           const newMarker = new frameGoogle.maps.Marker({
-            title: player.name,
+            title: `${player.name} - ${player.location.regionName}`,
             position: contentWindow.umConvertLocToLatLng(
               player.location.posX,
               player.location.posY
             ),
             map,
+            icon: {
+              url: `/cropped/${player.head}-${player.hair}.png`,
+              scaledSize: new frameGoogle.maps.Size(50, 50),
+            },
           });
           setMarkers([...markers, newMarker]);
         }
