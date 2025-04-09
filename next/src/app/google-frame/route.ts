@@ -25,7 +25,6 @@ export async function GET() {
     if (process.env.HIDE_SEARCH)
       styles += `#umSearchContainer {display: none !IMPORTANT;}`;
 
-    console.log(styles);
     const styleNode = dom.window.document.createElement("style");
     styleNode.textContent = styles;
     dom.window.document.head.appendChild(styleNode);
