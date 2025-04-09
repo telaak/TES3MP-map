@@ -12,6 +12,15 @@ do
                         hair = tes3mp.GetHair(i),
                         race = tes3mp.GetRace(i),
                         isMale = tes3mp.GetIsMale(i),
+                        stats = {
+                            baseHealth = tes3mp.GetHealthBase(i),
+                            currentHealth = tes3mp.GetHealthCurrent(i),
+                            baseMagicka = tes3mp.GetMagickaBase(i),
+                            currentMagicka = tes3mp.GetMagickaCurrent(i),
+                            baseFatigue = tes3mp.GetFatigueBase(i),
+                            currentFatigue = tes3mp.GetFatigueCurrent(i),
+                            level = tes3mp.GetLevel(i)
+                        },
                         location = {
                             cell = tes3mp.GetCell(i),
                             regionName = Players[i].data.location.regionName,
