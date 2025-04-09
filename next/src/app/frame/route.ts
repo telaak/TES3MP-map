@@ -18,7 +18,8 @@ export async function GET() {
     let styles = `
       #umMenuBar {display: none !IMPORTANT;}
       #umMapContainer {top: 0 !IMPORTANT;}
-
+      #umSearchContainer {top: 10px !IMPORTANT;}
+      
     `;
 
     if (process.env.HIDE_SEARCH)

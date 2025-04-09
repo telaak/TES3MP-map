@@ -64,7 +64,7 @@ export default function Home() {
     <Stack
       direction="column"
       style={{
-        height: "calc(100vh)",
+        height: "calc(100dvh)",
         width: "100dvw",
       }}
     >
@@ -73,7 +73,9 @@ export default function Home() {
           padding: "0.5em",
         }}
         direction="row"
-        spacing={2}
+        columnGap={2}
+        rowGap={2}
+        flexWrap="wrap"
       >
         {players.data &&
           players.data.map((player) => {
@@ -128,6 +130,8 @@ export default function Home() {
           onLoad={() => setIsFrameLoaded(true)}
           styles={{
             border: "none",
+            margin: 0,
+            padding: 0,
           }}
           id="frame"
           url="/frame"
