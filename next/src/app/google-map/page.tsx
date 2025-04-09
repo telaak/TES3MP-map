@@ -19,6 +19,17 @@ export default function Home() {
       const frameGoogle = contentWindow.google;
       const map = contentWindow.umMap;
 
+      for (const marker of markers) {
+        const foundPlayer = players.data.find((p) =>
+          (marker.getTitle() as string).startsWith(p.name)
+        );
+
+        if (!foundPlayer) {
+          marker.setMap(null);
+          setMarkers(markers.filter((m) => m !== marker));
+        }
+      }
+
       for (const player of players.data) {
         const marker = markers.find((m) =>
           (m.getTitle() as string).startsWith(player.name)

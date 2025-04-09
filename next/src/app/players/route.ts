@@ -1,3 +1,4 @@
+import dayjs, { Dayjs } from "dayjs";
 import { NextRequest } from "next/server";
 
 export type Player = {
@@ -25,19 +26,29 @@ export type Player = {
     previousZ: number;
     regionName: string;
   };
+  lastSeen: Dayjs;
 };
 
-const players: Player[] = [];
+let players: Player[] = [];
+
+const timer = setInterval(() => {
+  players = players.filter((player) => {
+    const diff = dayjs().diff(player.lastSeen, "seconds");
+    return diff <= 5;
+  });
+}, 1000);
 
 export async function POST(request: NextRequest) {
   try {
     const json: Player = await request.json();
     const playerIndex = players.findIndex((p) => p.name === json.name);
 
+    const withLastSeen = { ...json, lastSeen: dayjs() };
+
     if (playerIndex >= 0) {
-      players[playerIndex] = json;
+      players[playerIndex] = withLastSeen;
     } else {
-      players.push(json);
+      players.push(withLastSeen);
     }
 
     return new Response("OK", {

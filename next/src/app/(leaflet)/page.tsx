@@ -46,6 +46,17 @@ export default function Home() {
       const gamemap = leafletFrame.contentWindow.gamemap;
       const L = leafletFrame.contentWindow.L;
 
+      for (const marker of markers) {
+        const foundPlayer = players.data.find((p) =>
+          marker.options.title?.startsWith(p.name)
+        );
+
+        if (!foundPlayer) {
+          marker.remove();
+          setMarkers(markers.filter((m) => m !== marker));
+        }
+      }
+
       for (const player of players.data) {
         const foundMarker = markers.find((m) =>
           m.options.title?.startsWith(player.name)
