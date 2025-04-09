@@ -6,6 +6,15 @@ export type Player = {
   hair: string;
   race: string;
   isMale: number;
+  stats: {
+    baseHealth: number;
+    currentHealth: number;
+    baseMagicka: number;
+    currentMagicka: number;
+    baseFatigue: number;
+    currentFatigue: number;
+    level: number;
+  };
   location: {
     cell: string;
     posX: number;

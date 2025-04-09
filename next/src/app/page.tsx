@@ -4,7 +4,8 @@ import { AnimatedMarker, animateMarkerTo, getFrame } from "./MwMapIframe";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Player } from "./players/route";
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Badge, Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import StatBar from "@/components/StatBar";
 
 export default function Home() {
   const players = useQuery({
@@ -70,7 +71,7 @@ export default function Home() {
     >
       <Stack
         style={{
-          padding: "0.5em",
+          padding: "1em",
         }}
         direction="row"
         columnGap={2}
@@ -80,44 +81,69 @@ export default function Home() {
         {players.data &&
           players.data.map((player) => {
             return (
-              <Chip
-                label={
-                  <>
-                    <Stack direction="column">
-                      <Typography variant="h6">{player.name}</Typography>
-                      <Divider sx={{ borderBottomWidth: 2 }} />
-                      <Typography variant="body2">
-                        {player.location.regionName || player.location.cell}
-                      </Typography>
-                    </Stack>
-                  </>
-                }
-                onClick={() => {
-                  try {
-                    const contentWindow = getFrame().contentWindow;
-                    const map = contentWindow.umMap;
-
-                    const marker = markers.find((m) =>
-                      m.getTitle()!.startsWith(player.name)
-                    );
-
-                    map.panTo(marker!.getPosition() as google.maps.LatLng);
-                    map.setZoom(16);
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-                sx={{
-                  height: "auto",
-                  "& .MuiChip-label": {
-                    display: "block",
-                    whiteSpace: "normal",
-                  },
-                  paddingBottom: "0.5em",
-                  paddingTop: "0.25em",
-                }}
+              <Badge
                 key={player.name}
-              />
+                color="primary"
+                badgeContent={player.stats.level}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <Chip
+                  label={
+                    <>
+                      <Stack direction="column" spacing={0.5}>
+                        <Typography variant="h6">{player.name}</Typography>
+                        <Divider sx={{ borderBottomWidth: 2 }} />
+                        <Typography variant="body2">
+                          {player.location.regionName || player.location.cell}
+                        </Typography>
+                        <Divider sx={{ borderBottomWidth: 2 }} />
+                        <StatBar
+                          color="error"
+                          baseStat={player.stats.baseHealth}
+                          currentStat={player.stats.currentHealth}
+                        />
+                        <StatBar
+                          color="info"
+                          baseStat={player.stats.baseMagicka}
+                          currentStat={player.stats.currentMagicka}
+                        />
+                        <StatBar
+                          color="success"
+                          baseStat={player.stats.baseFatigue}
+                          currentStat={player.stats.currentFatigue}
+                        />
+                      </Stack>
+                    </>
+                  }
+                  onClick={() => {
+                    try {
+                      const contentWindow = getFrame().contentWindow;
+                      const map = contentWindow.umMap;
+
+                      const marker = markers.find((m) =>
+                        m.getTitle()!.startsWith(player.name)
+                      );
+
+                      map.panTo(marker!.getPosition() as google.maps.LatLng);
+                      map.setZoom(16);
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  }}
+                  sx={{
+                    height: "auto",
+                    "& .MuiChip-label": {
+                      display: "block",
+                      whiteSpace: "normal",
+                    },
+                    paddingBottom: "1em",
+                    paddingTop: "0.5em",
+                  }}
+                />
+              </Badge>
             );
           })}
       </Stack>
