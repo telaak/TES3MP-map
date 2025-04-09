@@ -7,14 +7,16 @@ export type StatBarProps = {
 };
 
 export default function StatBar(props: StatBarProps) {
+  const roundedCurrent = Math.round(props.currentStat);
+
   return (
     <Tooltip
       placement="right-start"
-      title={`${props.currentStat.toFixed(0)}/${props.baseStat}`}
+      title={`${roundedCurrent}/${props.baseStat}`}
     >
       <LinearProgress
         variant="determinate"
-        value={(props.currentStat / props.baseStat) * 100}
+        value={(roundedCurrent / props.baseStat) * 100}
         color={props.color}
         sx={{
           padding: "0.5em",
