@@ -4,7 +4,7 @@ import { AnimatedMarker, animateMarkerTo, getFrame } from "./MwMapIframe";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Player } from "./players/route";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 
 export default function Home() {
   const players = useQuery({
@@ -64,7 +64,7 @@ export default function Home() {
     <Stack
       direction="column"
       style={{
-        height: "calc(100dvh - 8px)",
+        height: "calc(100vh)",
         width: "100dvw",
       }}
     >
@@ -81,10 +81,13 @@ export default function Home() {
               <Chip
                 label={
                   <>
-                    <Typography variant="h6">{player.name}</Typography>
-                    <Typography variant="body2">
-                      {player.location.regionName || player.location.cell}
-                    </Typography>
+                    <Stack direction="column">
+                      <Typography variant="h6">{player.name}</Typography>
+                      <Divider sx={{ borderBottomWidth: 2 }} />
+                      <Typography variant="body2">
+                        {player.location.regionName || player.location.cell}
+                      </Typography>
+                    </Stack>
                   </>
                 }
                 onClick={() => {
@@ -108,6 +111,8 @@ export default function Home() {
                     display: "block",
                     whiteSpace: "normal",
                   },
+                  paddingBottom: "0.5em",
+                  paddingTop: "0.25em",
                 }}
                 key={player.name}
               />
@@ -121,6 +126,9 @@ export default function Home() {
       >
         <Iframe
           onLoad={() => setIsFrameLoaded(true)}
+          styles={{
+            border: "none",
+          }}
           id="frame"
           url="/frame"
           width="100%"
