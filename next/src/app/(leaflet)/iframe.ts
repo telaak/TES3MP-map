@@ -1,31 +1,31 @@
-"use client";
+import { LatLng } from "leaflet";
+import * as L from "leaflet";
 
-export type GoogleMapIframe = HTMLIFrameElement & {
+export type LeafletIframe = HTMLIFrameElement & {
   contentWindow: Window & {
-    google: typeof google;
-    umMap: google.maps.Map;
-    umConvertLocToLatLng: (x: number, y: number) => google.maps.LatLng;
+    gamemap: L.Map & {
+      getLatLngs: (cordArray: [x: number, y: number]) => LatLng;
+      isEmbedded: () => boolean;
+      getMap: () => L.Map;
+    };
+    L: typeof L;
   };
 };
 
-export function getGoogleFrame(): GoogleMapIframe {
-  const frame = document.getElementById("frame") as GoogleMapIframe;
+export function getLeafletFrame(): LeafletIframe {
+  const frame = document.getElementById("frame") as LeafletIframe;
   return frame;
 }
 
-export function getGoogleMap(): google.maps.Map {
-  return getGoogleFrame().contentWindow!.umMap as google.maps.Map;
-}
-
-export type AnimatedMarker = google.maps.Marker & {
+export type LeafletAnimatedMarker = L.Marker & {
   AT_startPosition_lat: number;
   AT_startPosition_lng: number;
   AT_animationHandler: number;
 };
 
-export function animateMarkerTo(
-  marker: AnimatedMarker,
-  newPosition: google.maps.LatLng,
+export function leafletAnimateMarkerTo(
+  marker: LeafletAnimatedMarker,
+  newPosition: L.LatLng,
   duration = 1000
 ) {
   const options = {
@@ -40,10 +40,11 @@ export function animateMarkerTo(
   window.cancelAnimationFrame = window.cancelAnimationFrame;
 
   // save current position. prefixed to avoid name collisions. separate for lat/lng to avoid calling lat()/lng() in every frame
-  marker.AT_startPosition_lat = marker.getPosition()!.lat();
-  marker.AT_startPosition_lng = marker.getPosition()!.lng();
-  const newPosition_lat = newPosition.lat();
-  let newPosition_lng = newPosition.lng();
+  const latLng = marker.getLatLng();
+  marker.AT_startPosition_lat = latLng.lat;
+  marker.AT_startPosition_lng = latLng.lng;
+  const newPosition_lat = newPosition.lat;
+  let newPosition_lng = newPosition.lng;
 
   // crossing the 180° meridian and going the long way around the earth?
   if (Math.abs(newPosition_lng - marker.AT_startPosition_lng) > 180) {
@@ -54,7 +55,10 @@ export function animateMarkerTo(
     }
   }
 
-  const animateStep = function (marker: AnimatedMarker, startTime: number) {
+  const animateStep = function (
+    marker: LeafletAnimatedMarker,
+    startTime: number
+  ) {
     const ellapsedTime = new Date().getTime() - startTime;
     const durationRatio = ellapsedTime / options.duration; // 0 - 1
     const easingDurationRatio = options.easing(
@@ -66,7 +70,7 @@ export function animateMarkerTo(
     );
 
     if (durationRatio < 1) {
-      marker.setPosition({
+      marker.setLatLng({
         lat:
           marker.AT_startPosition_lat +
           (newPosition_lat - marker.AT_startPosition_lat) * easingDurationRatio,
@@ -86,7 +90,7 @@ export function animateMarkerTo(
         }, 17) as unknown as number;
       }
     } else {
-      marker.setPosition(newPosition);
+      marker.setLatLng(newPosition);
     }
   };
 

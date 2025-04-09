@@ -10,8 +10,9 @@ export async function GET() {
 
     const dom = new jsdom.JSDOM(html);
 
-    let styles = `
+    const styles = `
       #watermark {display: none !IMPORTANT;}
+      .leaflet-marker-icon {background-color: unset !IMPORTANT; box-shadow: unset !IMPORTANT;}
     `;
 
     const styleNode = dom.window.document.createElement("style");

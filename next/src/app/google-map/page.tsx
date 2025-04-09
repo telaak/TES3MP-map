@@ -1,13 +1,13 @@
 "use client";
 import Iframe from "react-iframe";
-import { AnimatedMarker, animateMarkerTo, getFrame } from "./iframe";
+import { AnimatedMarker, animateMarkerTo, getGoogleFrame } from "./iframe";
 import { useEffect, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import PlayerOverlay from "@/components/PlayerOverlay";
-import { playerQuery } from "@/functions";
+import { usePlayerQuery } from "@/functions";
 
 export default function Home() {
-  const players = playerQuery();
+  const players = usePlayerQuery();
 
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
 
@@ -15,7 +15,7 @@ export default function Home() {
 
   useEffect(() => {
     if (players.data && isFrameLoaded) {
-      const contentWindow = getFrame().contentWindow;
+      const contentWindow = getGoogleFrame().contentWindow;
       const frameGoogle = contentWindow.google;
       const map = contentWindow.umMap;
 
@@ -73,7 +73,7 @@ export default function Home() {
             players={players.data}
             onClick={(player) => {
               try {
-                const contentWindow = getFrame().contentWindow;
+                const contentWindow = getGoogleFrame().contentWindow;
                 const map = contentWindow.umMap;
 
                 const marker = markers.find((m) =>

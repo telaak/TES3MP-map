@@ -60,7 +60,7 @@ export default function PlayerOverlay(props: PlayerOverlayProps) {
                   </Stack>
                 </>
               }
-              onClick={(e) => props.onClick(player)}
+              onClick={() => props.onClick(player)}
               sx={{
                 background: "rgba(0,0,0,0.5)",
                 height: "auto",

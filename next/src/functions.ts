@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Player } from "./app/players/route";
 
-export const playerQuery = () =>
+export const usePlayerQuery = () =>
   useQuery({
     queryKey: ["players"],
     queryFn: () =>
