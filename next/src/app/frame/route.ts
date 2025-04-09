@@ -18,14 +18,14 @@ export async function GET() {
     let styles = `
       #umMenuBar {display: none !IMPORTANT;}
       #umMapContainer {top: 0 !IMPORTANT;}
-      #umSearchContainer {top: 10px !IMPORTANT;}
-      
+      #umSearchContainer {top: 10px !IMPORTANT; right: 70px !IMPORTANT; left: unset !IMPORTANT;}
+
     `;
 
     if (process.env.HIDE_SEARCH)
       styles += `#umSearchContainer {display: none !IMPORTANT;}`;
 
-    console.log(styles)
+    console.log(styles);
     const styleNode = dom.window.document.createElement("style");
     styleNode.textContent = styles;
     dom.window.document.head.appendChild(styleNode);
