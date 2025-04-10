@@ -53,8 +53,8 @@ export default function Home() {
       spliceMarkers(markers, players.data);
 
       for (const player of players.data) {
-        const foundMarker = markers.find((m) =>
-          m.options.title?.startsWith(player.name)
+        const foundMarker = markers.find(
+          (m) => m.options.title! === player.name
         );
 
         if (foundMarker) {
