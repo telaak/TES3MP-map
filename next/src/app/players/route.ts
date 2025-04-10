@@ -29,14 +29,7 @@ export type Player = {
   lastSeen: Dayjs;
 };
 
-let players: Player[] = [];
-
-setInterval(() => {
-  players = players.filter((player) => {
-    const diff = dayjs().diff(player.lastSeen, "seconds");
-    return diff <= 5;
-  });
-}, 1000);
+const players: Player[] = [];
 
 export async function POST(request: NextRequest) {
   try {

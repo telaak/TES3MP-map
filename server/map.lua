@@ -4,7 +4,7 @@ map = {}
 do
     function Timer()
         if tableHelper.getCount(Players) > 0 then
-            for i = 0, tableHelper.getCount(Players) - 1 do
+            for i = 0, tes3mp.GetMaxPlayers() - 1 do
                 if (Players[i] ~= nil and Players[i].loggedIn) then
                     local request_body = {
                         name = Players[i].data.login.name,

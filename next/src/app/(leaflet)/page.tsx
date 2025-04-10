@@ -1,6 +1,6 @@
 "use client";
 import Iframe from "react-iframe";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import PlayerOverlay from "@/components/PlayerOverlay";
 import { usePlayerQuery } from "@/functions";
@@ -9,14 +9,18 @@ import {
   getLeafletFrame,
   leafletAnimateMarkerTo,
 } from "./iframe";
+import dayjs from "dayjs";
 
 export default function Home() {
   const players = usePlayerQuery();
 
-  const [markers, setMarkers] = useState<L.Marker[]>([]);
-
   const [isFrameLoaded, setIsFrameLoaded] = useState<boolean>(false);
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
+
+  const markers = useMemo(() => {
+    const array: L.Marker[] = [];
+    return array;
+  }, []);
 
   useEffect(() => {
     const checkInterval = setInterval(() => {
@@ -46,16 +50,19 @@ export default function Home() {
       const gamemap = leafletFrame.contentWindow.gamemap;
       const L = leafletFrame.contentWindow.L;
 
-      for (const marker of markers) {
+      markers.forEach((marker, index) => {
         const foundPlayer = players.data.find((p) =>
           marker.options.title?.startsWith(p.name)
         );
 
-        if (!foundPlayer) {
+        if (
+          !foundPlayer ||
+          dayjs().diff(foundPlayer.lastSeen, "seconds") >= 5
+        ) {
           marker.remove();
-          setMarkers(markers.filter((m) => m !== marker));
+          markers.splice(index, 1);
         }
-      }
+      });
 
       for (const player of players.data) {
         const foundMarker = markers.find((m) =>
@@ -77,7 +84,7 @@ export default function Home() {
           } else {
             foundMarker.options.title = `${player.name} - ${player.location.cell}`;
           }
-        } else {
+        } else if (dayjs().diff(player.lastSeen, "seconds") <= 5) {
           const headIcon = L.icon({
             iconUrl: `/head/${player.head}-${player.hair}.png`,
             iconSize: [50, 50],
@@ -86,11 +93,11 @@ export default function Home() {
             icon: headIcon,
             title: `${player.name} - ${player.location.regionName}`,
           }).addTo(gamemap.getMap());
-          setMarkers([...markers, marker]);
+          markers.push(marker);
         }
       }
     }
-  }, [isMapLoaded, players.data, markers]);
+  }, [isMapLoaded, players.data]);
 
   return (
     <Stack
