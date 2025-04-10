@@ -78,9 +78,6 @@ export default function Home() {
               foundMarker as LeafletAnimatedMarker,
               coords
             );
-            foundMarker.options.title = `${player.name} - ${player.location.regionName}`;
-          } else {
-            foundMarker.options.title = `${player.name} - ${player.location.cell}`;
           }
         } else {
           const headIcon = L.icon({
@@ -89,7 +86,7 @@ export default function Home() {
           });
           const marker = L.marker(coords, {
             icon: headIcon,
-            title: `${player.name} - ${player.location.regionName}`,
+            title: `${player.name}`,
           }).addTo(gamemap.getMap());
           markers.push(marker);
         }
