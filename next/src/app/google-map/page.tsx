@@ -64,7 +64,7 @@ export default function Home() {
         }
       }
     }
-  }, [players.data, isFrameLoaded]);
+  }, [players.data, isFrameLoaded, markers]);
 
   return (
     <Stack

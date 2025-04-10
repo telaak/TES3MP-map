@@ -31,7 +31,7 @@ export type Player = {
 
 let players: Player[] = [];
 
-const timer = setInterval(() => {
+setInterval(() => {
   players = players.filter((player) => {
     const diff = dayjs().diff(player.lastSeen, "seconds");
     return diff <= 5;

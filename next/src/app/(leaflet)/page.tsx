@@ -90,7 +90,7 @@ export default function Home() {
         }
       }
     }
-  }, [isMapLoaded, players.data]);
+  }, [isMapLoaded, players.data, markers]);
 
   return (
     <Stack
