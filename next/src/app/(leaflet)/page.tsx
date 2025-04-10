@@ -10,8 +10,6 @@ import {
   leafletAnimateMarkerTo,
 } from "./iframe";
 
-const markers: L.Marker[] = [];
-
 export default function Home() {
   const players = usePlayerQuery();
 
