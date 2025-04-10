@@ -3,7 +3,12 @@ import Iframe from "react-iframe";
 import { useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import PlayerOverlay from "@/components/PlayerOverlay";
-import { usePlayerQuery } from "@/functions";
+import {
+  addMarker,
+  getCoords,
+  spliceMarkers,
+  usePlayerQuery,
+} from "@/functions";
 import {
   LeafletAnimatedMarker,
   getLeafletFrame,
@@ -45,54 +50,22 @@ export default function Home() {
 
   useEffect(() => {
     if (isMapLoaded && players.data) {
-      const leafletFrame = getLeafletFrame();
-      const gamemap = leafletFrame.contentWindow.gamemap;
-      const L = leafletFrame.contentWindow.L;
-
-      for (let index = markers.length - 1; index >= 0; index--) {
-        const marker = markers[index];
-
-        const foundPlayer = players.data.find((p) =>
-          marker.options.title?.startsWith(p.name)
-        );
-
-        if (!foundPlayer) {
-          markers.splice(index, 1);
-          marker.remove();
-        }
-      }
+      spliceMarkers(markers, players.data);
 
       for (const player of players.data) {
         const foundMarker = markers.find((m) =>
           m.options.title?.startsWith(player.name)
         );
 
-        const coords = gamemap.getLatLngs([
-          player.location.posX,
-          player.location.posY,
-        ]);
-
         if (foundMarker) {
-          if (player.location.regionName.length > 0) {
-            leafletAnimateMarkerTo(
-              foundMarker as LeafletAnimatedMarker,
-              coords
-            );
-          }
+          const coords = getCoords(player);
+          leafletAnimateMarkerTo(foundMarker as LeafletAnimatedMarker, coords);
         } else {
-          const headIcon = L.icon({
-            iconUrl: `/head/${player.head}-${player.hair}.png`,
-            iconSize: [50, 50],
-          });
-          const marker = L.marker(coords, {
-            icon: headIcon,
-            title: `${player.name}`,
-          }).addTo(gamemap.getMap());
-          markers.push(marker);
+          addMarker(player, markers);
         }
       }
     }
-  }, [isMapLoaded, players.data]);
+  }, [isMapLoaded, players.data, markers]);
 
   return (
     <Stack
@@ -107,25 +80,7 @@ export default function Home() {
           height: "100%",
         }}
       >
-        {players.data && (
-          <PlayerOverlay
-            players={players.data}
-            onClick={(player) => {
-              const foundMarker = markers.find((m) =>
-                m.options.title?.startsWith(player.name)
-              );
-              if (foundMarker) {
-                const leafletFrame = getLeafletFrame();
-                const gamemap = leafletFrame.contentWindow.gamemap;
-                const coords = gamemap.getLatLngs([
-                  player.location.posX,
-                  player.location.posY,
-                ]);
-                gamemap.getMap().setView(coords, 16);
-              }
-            }}
-          />
-        )}
+        <PlayerOverlay />
         <Iframe
           onLoad={() => setIsFrameLoaded(true)}
           styles={{

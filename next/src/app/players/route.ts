@@ -1,33 +1,6 @@
-import dayjs, { Dayjs } from "dayjs";
+import { Player } from "@/types";
+import dayjs from "dayjs";
 import { NextRequest } from "next/server";
-
-export type Player = {
-  name: string;
-  head: string;
-  hair: string;
-  race: string;
-  isMale: number;
-  stats: {
-    baseHealth: number;
-    currentHealth: number;
-    baseMagicka: number;
-    currentMagicka: number;
-    baseFatigue: number;
-    currentFatigue: number;
-    level: number;
-  };
-  location: {
-    cell: string;
-    posX: number;
-    posY: number;
-    posZ: number;
-    previousX: number;
-    previousY: number;
-    previousZ: number;
-    regionName: string;
-  };
-  lastSeen: Dayjs;
-};
 
 const players: Player[] = [];
 

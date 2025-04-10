@@ -79,26 +79,7 @@ export default function Home() {
           height: "100%",
         }}
       >
-        {players.data && (
-          <PlayerOverlay
-            players={players.data}
-            onClick={(player) => {
-              try {
-                const contentWindow = getGoogleFrame().contentWindow;
-                const map = contentWindow.umMap;
-
-                const marker = markers.find((m) =>
-                  m.getTitle()!.startsWith(player.name)
-                );
-
-                map.panTo(marker!.getPosition() as google.maps.LatLng);
-                map.setZoom(16);
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-          />
-        )}
+        <PlayerOverlay />
         <Iframe
           onLoad={() => setIsFrameLoaded(true)}
           styles={{
