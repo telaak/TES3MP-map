@@ -9,7 +9,8 @@ import {
   getLeafletFrame,
   leafletAnimateMarkerTo,
 } from "./iframe";
-import dayjs from "dayjs";
+
+const markers: L.Marker[] = [];
 
 export default function Home() {
   const players = usePlayerQuery();
@@ -50,19 +51,18 @@ export default function Home() {
       const gamemap = leafletFrame.contentWindow.gamemap;
       const L = leafletFrame.contentWindow.L;
 
-      markers.forEach((marker, index) => {
+      for (let index = markers.length - 1; index >= 0; index--) {
+        const marker = markers[index];
+
         const foundPlayer = players.data.find((p) =>
           marker.options.title?.startsWith(p.name)
         );
 
-        if (
-          !foundPlayer ||
-          dayjs().diff(foundPlayer.lastSeen, "seconds") >= 5
-        ) {
-          marker.remove();
+        if (!foundPlayer) {
           markers.splice(index, 1);
+          marker.remove();
         }
-      });
+      }
 
       for (const player of players.data) {
         const foundMarker = markers.find((m) =>
@@ -84,7 +84,7 @@ export default function Home() {
           } else {
             foundMarker.options.title = `${player.name} - ${player.location.cell}`;
           }
-        } else if (dayjs().diff(player.lastSeen, "seconds") <= 5) {
+        } else {
           const headIcon = L.icon({
             iconUrl: `/head/${player.head}-${player.hair}.png`,
             iconSize: [50, 50],

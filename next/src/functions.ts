@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Player } from "./app/players/route";
 import { NextRequest } from "next/server";
+import dayjs from "dayjs";
 
 export const usePlayerQuery = () =>
   useQuery({
     queryKey: ["players"],
-    queryFn: () =>
-      fetch("/players").then((res) => res.json()) as Promise<Player[]>,
+    queryFn: async () => {
+      const players: Player[] = await fetch("/players").then((res) =>
+        res.json()
+      );
+      return players.filter((p) => dayjs().diff(p.lastSeen, "seconds") <= 5);
+    },
     refetchInterval: 250,
   });
 
