@@ -31,7 +31,7 @@ export default function MapMarker({ player }: { player: Player }) {
 
     marker.bindTooltip(player.name, {
       direction: "top",
-      offset: new L.Point(0, -12.5),
+      offset: new L.Point(0, -15),
       permanent: true,
     });
 
