@@ -31,57 +31,67 @@ export default function PlayerOverlay() {
               <Chip
                 key={player.name}
                 label={
-                  <>
-                    <Stack direction="column" spacing={0.5}>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="h6">{player.name}</Typography>
-                        <Typography variant="body1">
-                          {player.stats.level}
-                        </Typography>
-                      </Stack>
-
-                      <Divider sx={{ borderBottomWidth: 2 }} />
-                      <Button
-                        color="inherit"
-                        variant="contained"
-                        onClick={() => {
-                          const coords = getCoords(player);
-                          setView(coords, 16);
-                        }}
-                      >
-                        <Typography variant="body2">
-                          {player.location.regionName || player.location.cell}
-                        </Typography>
-                      </Button>
-
-                      <Divider sx={{ borderBottomWidth: 2 }} />
-                      <StatBar
-                        color="error"
-                        baseStat={player.stats.baseHealth}
-                        currentStat={player.stats.currentHealth}
-                      />
-                      <StatBar
-                        color="info"
-                        baseStat={player.stats.baseMagicka}
-                        currentStat={player.stats.currentMagicka}
-                      />
-                      <StatBar
-                        color="success"
-                        baseStat={player.stats.baseFatigue}
-                        currentStat={player.stats.currentFatigue}
-                      />
+                  <Stack
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      rowGap: 0.5,
+                      height: "100%",
+                    }}
+                  >
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="h6">{player.name}</Typography>
+                      <Typography variant="body1">
+                        {player.stats.level}
+                      </Typography>
                     </Stack>
-                  </>
+
+                    <Divider sx={{ borderBottomWidth: 2 }} />
+                    <Button
+                      sx={{
+                        flexGrow: 1,
+                      }}
+                      color="inherit"
+                      variant="contained"
+                      onClick={() => {
+                        const coords = getCoords(player);
+                        setView(coords, 16);
+                      }}
+                    >
+                      <Typography variant="body2">
+                        {player.location.regionName || player.location.cell}
+                      </Typography>
+                    </Button>
+
+                    <Divider sx={{ borderBottomWidth: 2 }} />
+                    <StatBar
+                      color="error"
+                      baseStat={player.stats.baseHealth}
+                      currentStat={player.stats.currentHealth}
+                    />
+                    <StatBar
+                      color="info"
+                      baseStat={player.stats.baseMagicka}
+                      currentStat={player.stats.currentMagicka}
+                    />
+                    <StatBar
+                      color="success"
+                      baseStat={player.stats.baseFatigue}
+                      currentStat={player.stats.currentFatigue}
+                    />
+                  </Stack>
                 }
                 sx={{
                   background: "rgba(0,0,0,0.5)",
                   height: "auto",
                   "& .MuiChip-label": {
-                    display: "block",
+                    //  display: "block",
                     whiteSpace: "normal",
+                    height: "100%",
                   },
                   paddingBottom: "1em",
                   paddingTop: "0.5em",
+                  maxWidth: "15em",
                 }}
               />
             );
