@@ -1,30 +1,21 @@
 "use client";
 import Iframe from "react-iframe";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import PlayerOverlay from "@/components/PlayerOverlay";
 import {
-  addMarker,
-  getCoords,
-  spliceMarkers,
   usePlayerQuery,
 } from "@/functions";
 import {
-  LeafletAnimatedMarker,
   getLeafletFrame,
-  leafletAnimateMarkerTo,
 } from "./iframe";
+import MapMarker from "@/components/MapMarker";
 
 export default function Home() {
   const players = usePlayerQuery();
 
   const [isFrameLoaded, setIsFrameLoaded] = useState<boolean>(false);
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
-
-  const markers = useMemo(() => {
-    const array: L.Marker[] = [];
-    return array;
-  }, []);
 
   useEffect(() => {
     const checkInterval = setInterval(() => {
@@ -48,25 +39,6 @@ export default function Home() {
     return () => clearInterval(checkInterval);
   }, [isFrameLoaded]);
 
-  useEffect(() => {
-    if (isMapLoaded && players.data) {
-      spliceMarkers(markers, players.data);
-
-      for (const player of players.data) {
-        const foundMarker = markers.find(
-          (m) => m.options.title! === player.name
-        );
-
-        if (foundMarker) {
-          const coords = getCoords(player);
-          leafletAnimateMarkerTo(foundMarker as LeafletAnimatedMarker, coords);
-        } else {
-          addMarker(player, markers);
-        }
-      }
-    }
-  }, [isMapLoaded, players.data, markers]);
-
   return (
     <Stack
       direction="column"
@@ -81,6 +53,9 @@ export default function Home() {
         }}
       >
         <PlayerOverlay />
+        {isMapLoaded &&
+          players.data &&
+          players.data.map((p) => <MapMarker key={p.name} player={p} />)}
         <Iframe
           onLoad={() => setIsFrameLoaded(true)}
           styles={{
