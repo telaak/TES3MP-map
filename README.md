@@ -4,8 +4,9 @@ Dynamic real‑time player map for TES3MP using UESP's Morrowind world map tiles
 
 * Player overlay with stats (health / magicka / fatigue / level)
 * Player heads with player names on the map
+* Click the location to zoom onto a player
 
-
+<img width="698" height="473" alt="Screenshot 2025-10-07 at 13 51 03" src="https://github.com/user-attachments/assets/5bf22e58-97ba-4907-9373-7bfe1b02a04a" />
 
 ---
 
