@@ -1,12 +1,45 @@
+--[[
+        Module: map.lua
+    Purpose: Periodically collect online player state from the TES3MP server and
+             POST it as a single batched JSON payload to an external map API endpoint
+             defined by the MAP_API environment variable (one HTTP request per interval).
+             When the player list becomes empty, an empty array is POSTed once; further
+             empty intervals are suppressed until at least one player reconnects.
+
+    Data Sent Per Player (inside top-level 'players' array):
+            * Identity: name, race, gender (isMale), head, hair
+            * Stats: base & current health, magicka, fatigue, level
+            * Location: current cell & region plus current and previous cell XYZ positions
+
+        Scheduling:
+            * A repeating tes3mp timer invokes Timer() every API_INTERVAL ms (env var)
+            * Timer restarts itself at the end to ensure continuous updates
+
+        Dependencies:
+            * LuaSocket (socket.http, ltn12) for HTTP POST
+            * dkjson for JSON encoding
+            * Global tables/functions provided by TES3MP scripting environment:
+                    - Players, tableHelper, tes3mp
+--]]
+
 http = require("socket.http")
 json = require("dkjson")
 map = {}
+-- Tracks whether the last successful POST had zero players. Used to avoid
+-- repeatedly sending empty payloads every interval; we only send an empty
+-- array once when transitioning from non-empty -> empty.
+local wasEmptyLastTick = false
 do
     function Timer()
-        if tableHelper.getCount(Players) > 0 then
+        local playerCount = tableHelper.getCount(Players)
+        -- Proceed only if at least one player is connected (playerCount > 0)
+        if playerCount > 0 then
+            local playersPayload = {} -- accumulate all active player objects
+            -- Iterate over all possible player slots
             for i = 0, tes3mp.GetMaxPlayers() - 1 do
+                -- Validate active, logged-in player entry
                 if (Players[i] ~= nil and Players[i].loggedIn) then
-                    local request_body = {
+                    table.insert(playersPayload, {
                         name = Players[i].data.login.name,
                         head = tes3mp.GetHead(i),
                         hair = tes3mp.GetHair(i),
@@ -31,31 +64,58 @@ do
                             previousY = tes3mp.GetPreviousCellPosY(i),
                             previousZ = tes3mp.GetPreviousCellPosZ(i)
                         }
-                    }
-
-                    local request_body = json.encode(request_body, {
-                        indent = true
                     })
-
-                    local response_body = {}
-
-                    local res, code, response_headers = http.request {
-                        url = os.getenv("MAP_API"),
-                        method = "POST",
-                        headers = {
-                            ["Content-Type"] = "application/json",
-                            ["Content-Length"] = #request_body
-                        },
-                        source = ltn12.source.string(request_body),
-                        sink = ltn12.sink.table(response_body)
-                    }
                 end
             end
+
+            -- Only send request if there were any active players collected
+            if #playersPayload > 0 then
+                local request_body = json.encode({ players = playersPayload }, { indent = true })
+                local response_body = {}
+                local res, code, response_headers = http.request {
+                    url = os.getenv("MAP_API"),
+                    method = "POST",
+                    headers = {
+                        ["Content-Type"] = "application/json",
+                        ["Content-Length"] = #request_body
+                    },
+                    source = ltn12.source.string(request_body),
+                    sink = ltn12.sink.table(response_body)
+                }
+                local response_str = table.concat(response_body)
+                if code < 200 or code >= 300 then
+                    tes3mp.LogMessage(2, "[map.lua] Warning: non-2xx response received from MAP_API: " .. tostring(code) .. " - " .. response_str)
+                end
+                wasEmptyLastTick = false -- we sent non-empty payload
+            end
+        else
+            -- No players currently online. If we haven't yet notified the API of emptiness, do so once.
+            if wasEmptyLastTick == false then
+                local request_body = json.encode({ players = {} }, { indent = true })
+                local response_body = {}
+                local res, code, response_headers = http.request {
+                    url = os.getenv("MAP_API"),
+                    method = "POST",
+                    headers = {
+                        ["Content-Type"] = "application/json",
+                        ["Content-Length"] = #request_body
+                    },
+                    source = ltn12.source.string(request_body),
+                    sink = ltn12.sink.table(response_body)
+                }
+                local response_str = table.concat(response_body)
+                if code and (code < 200 or code >= 300) then
+                    tes3mp.LogMessage(2, "[map.lua] Warning: empty payload non-2xx response from MAP_API: " .. tostring(code) .. " - " .. response_str)
+                end
+                wasEmptyLastTick = true -- prevent repeated empty sends
+            end
         end
+        -- Reschedule timer using the current interval from environment
         tes3mp.RestartTimer(timerId, tonumber(os.getenv("API_INTERVAL")))
     end
 end
 
+-- Create repeating timer and start it
 timerId = tes3mp.CreateTimer("Timer", tonumber(os.getenv("API_INTERVAL")))
 tes3mp.StartTimer(timerId)
 
