@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { NextRequest } from "next/server";
-import dayjs from "dayjs";
 import { MorrowindLocation, Player } from "./types";
 import { locations } from "./app/constants";
 import { getLeafletFrame } from "./app/(leaflet)/iframe";
