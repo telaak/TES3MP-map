@@ -20,6 +20,9 @@
             * dkjson for JSON encoding
             * Global tables/functions provided by TES3MP scripting environment:
                     - Players, tableHelper, tes3mp
+        * Environment:
+            - MAP_API (target endpoint)
+            - MAP_SHARED_SECRET (shared password; sent as X-Map-Auth header)
 --]]
 
 http = require("socket.http")
@@ -77,7 +80,8 @@ do
                     method = "POST",
                     headers = {
                         ["Content-Type"] = "application/json",
-                        ["Content-Length"] = #request_body
+                        ["Content-Length"] = #request_body,
+                        ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
                     },
                     source = ltn12.source.string(request_body),
                     sink = ltn12.sink.table(response_body)
@@ -98,7 +102,8 @@ do
                     method = "POST",
                     headers = {
                         ["Content-Type"] = "application/json",
-                        ["Content-Length"] = #request_body
+                        ["Content-Length"] = #request_body,
+                        ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
                     },
                     source = ltn12.source.string(request_body),
                     sink = ltn12.sink.table(response_body)
