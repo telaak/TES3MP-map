@@ -92,6 +92,7 @@ Below is a sample `docker-compose.yml` you can adapt:
 services:
     tes3mp:
         container_name: tes3mp
+        image: ghcr.io/telaak/tes3mp-map-server:1.01
         restart: unless-stopped
         ports:
             - 25565:25565/tcp
@@ -108,15 +109,14 @@ services:
             - API_INTERVAL=500
         volumes:
             - /data/openmw-tes3mp:/openmw
-        image: ghcr.io/telaak/tes3mp-map-server:github-actions
 
 
     next:
       container_name: next
+      image: ghcr.io/telaak/tes3mp-map-next:1.0.1
       restart: unless-stopped
       ports:
         - 3000:3000
-      image: ghcr.io/telaak/tes3mp-map-next:github-actions
       environment:
         - HIDE_SEARCH=true
         - HIDE_LOCATIONS=true
