@@ -1,21 +1,13 @@
 import { Player } from "@/types";
-import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
-const players: Player[] = [];
+let players: Player[] = [];
 
 export async function POST(request: NextRequest) {
   try {
-    const json: Player = await request.json();
-    const playerIndex = players.findIndex((p) => p.name === json.name);
-
-    const withLastSeen = { ...json, lastSeen: dayjs() };
-
-    if (playerIndex >= 0) {
-      players[playerIndex] = withLastSeen;
-    } else {
-      players.push(withLastSeen);
-    }
+    const json = await request.json();
+    const jsonPlayers =  json.players as Player[];
+    players = jsonPlayers;
 
     return new Response("OK", {
       status: 200,

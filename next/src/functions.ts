@@ -13,7 +13,7 @@ export const usePlayerQuery = () =>
       const players: Player[] = await fetch("/players").then((res) =>
         res.json()
       );
-      return players.filter((p) => dayjs().diff(p.lastSeen, "seconds") <= 5);
+      return players
     },
     refetchInterval: 250,
   });
