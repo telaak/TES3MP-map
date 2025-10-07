@@ -1,3 +1,5 @@
+// Generated from UESP Map data
+
 export const locations = [
   {
     id: 1,

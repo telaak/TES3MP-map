@@ -26,6 +26,7 @@
 --]]
 
 http = require("socket.http")
+http.timeout = 0
 json = require("dkjson")
 map = {}
 -- Tracks whether the last successful POST had zero players. Used to avoid
@@ -74,8 +75,7 @@ do
             -- Only send request if there were any active players collected
             if #playersPayload > 0 then
                 local request_body = json.encode({ players = playersPayload }, { indent = true })
-                local response_body = {}
-                local res, code, response_headers = http.request {
+                http.request {
                     url = os.getenv("MAP_API"),
                     method = "POST",
                     headers = {
@@ -84,20 +84,15 @@ do
                         ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
                     },
                     source = ltn12.source.string(request_body),
-                    sink = ltn12.sink.table(response_body)
+                    sink = ltn12.sink.null() -- discard any response bytes without allocation
                 }
-                local response_str = table.concat(response_body)
-                if code < 200 or code >= 300 then
-                    tes3mp.LogMessage(2, "[map.lua] Warning: non-2xx response received from MAP_API: " .. tostring(code) .. " - " .. response_str)
-                end
                 wasEmptyLastTick = false -- we sent non-empty payload
             end
         else
             -- No players currently online. If we haven't yet notified the API of emptiness, do so once.
             if wasEmptyLastTick == false then
                 local request_body = json.encode({ players = {} }, { indent = true })
-                local response_body = {}
-                local res, code, response_headers = http.request {
+                http.request {
                     url = os.getenv("MAP_API"),
                     method = "POST",
                     headers = {
@@ -106,12 +101,8 @@ do
                         ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
                     },
                     source = ltn12.source.string(request_body),
-                    sink = ltn12.sink.table(response_body)
+                    sink = ltn12.sink.null()
                 }
-                local response_str = table.concat(response_body)
-                if code and (code < 200 or code >= 300) then
-                    tes3mp.LogMessage(2, "[map.lua] Warning: empty payload non-2xx response from MAP_API: " .. tostring(code) .. " - " .. response_str)
-                end
                 wasEmptyLastTick = true -- prevent repeated empty sends
             end
         end

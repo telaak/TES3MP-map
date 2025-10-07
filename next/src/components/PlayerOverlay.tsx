@@ -1,11 +1,16 @@
+/**
+ * PlayerOverlay
+ * Displays a responsive overlay of all active players with quick-glance stats and map jump buttons.
+ * Each player is rendered as a Material UI Chip containing:
+ *  - Name & level header
+ *  - Region/cell jump button (centers map on click)
+ *  - Three StatBar components for Health, Magicka, Fatigue
+ * Layout wraps across rows using a flex Stack for responsiveness.
+ */
 import { Box, Stack, Chip, Typography, Divider, Button } from "@mui/material";
 import StatBar from "./StatBar";
 import { Player } from "@/types";
 import { getCoords, setView, usePlayerQuery } from "@/functions";
-
-export type PlayerOverlayProps = {
-  onClick: (player: Player) => void;
-};
 
 export default function PlayerOverlay() {
   const players = usePlayerQuery();
@@ -26,7 +31,7 @@ export default function PlayerOverlay() {
         flexWrap="wrap"
       >
         {players.data &&
-          players.data.map((player) => {
+          players.data.map((player: Player) => {
             return (
               <Chip
                 key={player.name}
@@ -85,7 +90,6 @@ export default function PlayerOverlay() {
                   background: "rgba(0,0,0,0.5)",
                   height: "auto",
                   "& .MuiChip-label": {
-                    //  display: "block",
                     whiteSpace: "normal",
                     height: "100%",
                   },
