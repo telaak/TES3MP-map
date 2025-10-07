@@ -25,50 +25,14 @@
             - MAP_SHARED_SECRET (shared password; sent as X-Map-Auth header)
 --]]
 
-http = require("socket.http") -- retained for potential future fallback but not used for blocking calls now
-local urlParser = require("socket.url")
-local tcp = require("socket").tcp
+http = require("socket.http")
+http.timeout = 0
 json = require("dkjson")
 map = {}
 -- Tracks whether the last successful POST had zero players. Used to avoid
 -- repeatedly sending empty payloads every interval; we only send an empty
 -- array once when transitioning from non-empty -> empty.
 local wasEmptyLastTick = false
-
--- Fire-and-forget POST using raw TCP; sends request then immediately closes without reading the response.
--- Limitations:
---   * Only supports plain http:// (no TLS). If MAP_API uses https, call is skipped silently.
---   * No retry, no status visibility, failures after connect are ignored.
--- Appropriate for best-effort telemetry where latency and non-blocking behavior trump reliability metrics.
-local function fireAndForgetPost(rawUrl, body)
-    if not rawUrl or rawUrl == '' then return end
-    local parsed = urlParser.parse(rawUrl)
-    if not parsed or not parsed.host then return end
-    if parsed.scheme and parsed.scheme ~= 'http' then return end
-    local host = parsed.host
-    local port = tonumber(parsed.port) or 80
-    local path = parsed.path or '/'
-    local secret = os.getenv("MAP_SHARED_SECRET") or ""
-    local requestLines = {
-        string.format("POST %s HTTP/1.1", path),
-        "Host: " .. host,
-        "Content-Type: application/json",
-        "Content-Length: " .. tostring(#body),
-        "Connection: close",
-        "X-Map-Auth: " .. secret,
-        "",
-        body
-    }
-    local payload = table.concat(requestLines, "\r\n")
-    local sock = tcp()
-    if not sock then return end
-    sock:settimeout(0.3)
-    if not sock:connect(host, port) then
-        sock:close(); return
-    end
-    sock:send(payload)
-    sock:close()
-end
 do
     function Timer()
         local playerCount = tableHelper.getCount(Players)
@@ -111,14 +75,34 @@ do
             -- Only send request if there were any active players collected
             if #playersPayload > 0 then
                 local request_body = json.encode({ players = playersPayload }, { indent = true })
-                fireAndForgetPost(os.getenv("MAP_API"), request_body)
+                http.request {
+                    url = os.getenv("MAP_API"),
+                    method = "POST",
+                    headers = {
+                        ["Content-Type"] = "application/json",
+                        ["Content-Length"] = #request_body,
+                        ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
+                    },
+                    source = ltn12.source.string(request_body),
+                    sink = ltn12.sink.null() -- discard any response bytes without allocation
+                }
                 wasEmptyLastTick = false -- we sent non-empty payload
             end
         else
             -- No players currently online. If we haven't yet notified the API of emptiness, do so once.
             if wasEmptyLastTick == false then
                 local request_body = json.encode({ players = {} }, { indent = true })
-                fireAndForgetPost(os.getenv("MAP_API"), request_body)
+                http.request {
+                    url = os.getenv("MAP_API"),
+                    method = "POST",
+                    headers = {
+                        ["Content-Type"] = "application/json",
+                        ["Content-Length"] = #request_body,
+                        ["X-Map-Auth"] = os.getenv("MAP_SHARED_SECRET") or ""
+                    },
+                    source = ltn12.source.string(request_body),
+                    sink = ltn12.sink.null()
+                }
                 wasEmptyLastTick = true -- prevent repeated empty sends
             end
         end
