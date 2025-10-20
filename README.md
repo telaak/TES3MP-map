@@ -92,7 +92,7 @@ Below is a sample `docker-compose.yml` you can adapt:
 services:
     tes3mp:
         container_name: tes3mp
-        image: ghcr.io/telaak/tes3mp-map-server:1.01
+        image: ghcr.io/telaak/tes3mp-map-server:1.0.1
         restart: unless-stopped
         ports:
             - 25565:25565/tcp
@@ -179,7 +179,7 @@ Located in `head-generator/`:
 | `parseImages.js` | Automates cycling through head/hair combos in a browser scene capturing PNGs with a green background. |
 | `crop.js` | Removes chroma green (#00FF00) & autocrops to content using `replace-color` + Jimp. |
 
-Pre-generated processed head icon assets are checked in at `next/public/heads/`. The application serves these directly; regenerate only if you add new head/hair combinations or want different processing (tolerance, sizing, etc.).
+Pre-generated  head icon assets can be found at `next/public/heads/`. There should be no need to re-generate these (also the original site is down)
 
 Basic usage:
 ```bash
@@ -209,11 +209,10 @@ type Player = {
 ```
 
 ## 8. Security (Shared Secret)
-All ingestion requests must include:
+All requests must include:
 ```
 X-Map-Auth: <MAP_SHARED_SECRET>
 ```
-If the header is missing or incorrect, the POST returns **401 Unauthorized**. Ensure HTTPS is used publicly so the header is not exposed in transit.
 
 ## 9. Troubleshooting
 | Issue | Cause | Fix |
