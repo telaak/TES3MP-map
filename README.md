@@ -92,7 +92,7 @@ Below is a sample `docker-compose.yml` you can adapt:
 services:
     tes3mp:
         container_name: tes3mp
-        image: ghcr.io/telaak/tes3mp-map-server:1.0.1
+        image: ghcr.io/telaak/tes3mp-map-server:1.0.2
         restart: unless-stopped
         ports:
             - 25565:25565/tcp
@@ -113,7 +113,7 @@ services:
 
     next:
       container_name: next
-      image: ghcr.io/telaak/tes3mp-map-next:1.0.1
+      image: ghcr.io/telaak/tes3mp-map-next:1.0.2
       restart: unless-stopped
       ports:
         - 3000:3000
